@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+        "iostream": "cpp",
+        "ostream": "cpp",
+        "vector": "cpp",
+        "ios": "cpp",
+        "xstring": "cpp",
+        "xlocale": "cpp",
+        "utility": "cpp"
+    },
+    "jupyter.jupyterServerType": "local"
+}
