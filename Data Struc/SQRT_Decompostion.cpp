@@ -5,7 +5,7 @@ int BLOCK_SIZE = (sqrt(MAXN)+0.5);
 
 
 
-//REMEMBER THERE IS SOMETHIGN CALLED AS SQRT TREE WHICH HAS O(1) query and shit, check it out on CP Algorithms
+//REMEMBER THERE IS SOMETHING CALLED AS SQRT TREE WHICH HAS O(1) query and shit, check it out on CP Algorithms
 
 
 // struct Query{

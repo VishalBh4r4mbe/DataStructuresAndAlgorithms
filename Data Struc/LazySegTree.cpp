@@ -175,14 +175,14 @@ struct LazySegmentTreeSum{
         shouldUpdate.assign(4*n,false);
     }
     
-    void build(const vector<long long int>&a, int v, int tl, int tr) {
+    void buildInner(const vector<long long int>&a, int v, int tl, int tr) {
         if (tl == tr) {
             tree[v] = a[tl];
         } 
         else {
             int tm = (tl + tr) / 2;
-            build(a, v*2, tl, tm);
-            build(a, v*2+1, tm+1, tr);
+            buildInner(a, v*2, tl, tm);
+            buildInner(a, v*2+1, tm+1, tr);
             tree[v] = tree[2*v]+tree[2*v+1]; 
         }
     }
@@ -237,12 +237,15 @@ struct LazySegmentTreeSum{
     long long int sumUtil(int l , int r){
       return sum(1,1,n,l,r);
     }
+    void build(const vector<long long int> &v){
+        this->buildInner(v,1,0,v.size()-1);
+    }
 };
 
 int main(){
     vector<long long int> x{1,4,2,3,5,6};
     LazySegmentTreeSum stsum(6);
-    stsum.build(x,1,0,5);
+    stsum.build(x);
     
     //cout<<stmax.maxUtil(1,4)<<" "<<stmin.minUtil(1,4)<<endl;
     stsum.updateUtil(1,3,4);
