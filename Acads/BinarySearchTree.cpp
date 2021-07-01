@@ -141,16 +141,35 @@ template<typename T> class BST{
                 return true;
             }
         } 
-        T max(){
-            return findMax(root)->data;
-        }
-        T min(){
-            return findMin(root)->data;
+        // T max(){
+        //     return findMax(root)->data;
+        // }
+        // T min(){
+        //     return findMin(root)->data;
+        // }
+        // Node<T>* getHead(){
+        //     return this->head;
+        // }
+        int height(Node<T>* cur){
+            if(cur==nullptr)return 0;
+            else{
+                return 1+max(height(cur->leftChild),height(cur->rightChild));
+            }
         }
 };
        
 int main(){
     BST<int> bst;
+    vector<int> insert{21, 15, 7, 41, 6, 23, 5, 46, 55, 72, 11, 17, 45, 32, 2, 80, 19, 65, 71, 38};
+    for(int i=0;i<insert.size();i++){
+        bst.insert(insert[i]);
+    }
     
+    vector<int> delet{ 2,32,72,65};
+    for(int i=0; i<delet.size(); i++){
+        bst.remove(delet[i]);
+    }
+
+    cout<<bst.height(bst.getHead());
  
 }   

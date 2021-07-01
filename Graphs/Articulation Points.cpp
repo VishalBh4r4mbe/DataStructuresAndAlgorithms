@@ -14,7 +14,7 @@ void dfs(int node,int parent=-1){
         if(to==parent){
             continue;
         }
-        if(vnodeis[to]){
+        if(vis[to]){
             low[node]= min(low[node],ti[to]);
         }
         else{

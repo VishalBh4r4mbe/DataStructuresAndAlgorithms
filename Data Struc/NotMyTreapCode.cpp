@@ -19,6 +19,31 @@ namespace treap //WARNING: NOT VERIFIED
 		7. SUM x y: what is the sum of all numbers in sub-sequence {Ax...Ay}. For example, the answer to "SUM 3 5" on {1, 2, 3, 4, 5} is 12
 	*/
 	typedef int node;
+		// void debug2 (node t)
+	// {
+	// 	if (t != NIL)
+	// 	{
+	// 		push(t);
+	// 		debug2(lch[t]);
+	// 		//cerr << "(val = " << val[t] << " min = " << get_min(t) << ") ";
+	// 		cerr << val[t] << " ";
+	// 		debug2(rch[t]);
+	// 	}
+	// }
+
+	// void debug ()
+	// {
+	// 	cerr << "debugging" << endl;
+	// 	debug2(root);
+	// 	cerr << endl;
+	// }
+
+	// void debug (node t)
+	// {
+	// 	cerr << "debugging" << endl;
+	// 	debug2(t);
+	// 	cerr << endl;
+	// }
 
 	const int MAXN = 2e5 + 5, MAXS = 8e6, NIL = 0, oo = 1e9 + 5;
 
@@ -75,32 +100,6 @@ namespace treap //WARNING: NOT VERIFIED
 				acc[t] = 0;
 			}
 		}
-	}
-
-	void debug2 (node t)
-	{
-		if (t != NIL)
-		{
-			push(t);
-			debug2(lch[t]);
-			//cerr << "(val = " << val[t] << " min = " << get_min(t) << ") ";
-			cerr << val[t] << " ";
-			debug2(rch[t]);
-		}
-	}
-
-	void debug ()
-	{
-		cerr << "debugging" << endl;
-		debug2(root);
-		cerr << endl;
-	}
-
-	void debug (node t)
-	{
-		cerr << "debugging" << endl;
-		debug2(t);
-		cerr << endl;
 	}
 
 	void update (node t)

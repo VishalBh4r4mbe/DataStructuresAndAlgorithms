@@ -2,9 +2,6 @@
 for different SegmentTree functions change the tree[v] wala line in Build and Update
 and in a similar manner, use which Utility is suitable for the purpose of use
 */
-/*
-Will define 3 structs
-*/
 
 #include <bits/stdc++.h>
 
@@ -205,7 +202,7 @@ struct LazySegmentTreeSum{
     long long int sum(int node, int L, int R, int i, int j)
 	{
 		if(shouldUpdate[node])propagate(node, L, R);
-		if(j<L || i>R)return ZERO;
+		if(j<L || i>R)return ZERO; // min  INF, max - -INF....
 		if(i<=L && R<=j)return tree[node];
 		int M = (L + R)/2;
 		long long int left=sum(node*2, L, M, i, j);
