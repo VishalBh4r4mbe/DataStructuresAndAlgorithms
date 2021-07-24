@@ -293,13 +293,50 @@ cerr << "\nDuration: " << ((chrono::duration <double>)(End - Begin)).count() << 
 
 // const int dx[] = {0, 1, 0, -};
 // const int dy[] = {1, 0, -1, 0};
+class SegmentTree{
+    public:
+    int n;
+    vector<int> tree;
+    SegmentTree(vector<int> &x){
+        this->n=x.size();
+        tree.resize(2*n,0);
+        for(int i=n;i<2*n;i++)tree[i] = x[i-n];
+        for (int i = n - 1; i > 0; --i) tree[i] = tree[i<<1] + tree[i<<1|1];
+    }
+    void set(int p, int value) {for (tree[p += n] = value; p > 1; p >>= 1) tree[p>>1] = tree[p] + tree[p^1];}
+    // all on interval [l, r)
+    int query(int l, int r) {int res = 0;for (l += n, r += n; l < r; l >>= 1, r >>= 1) {if (l&1) res += tree[l++];if (r&1) res += tree[--r];}return res;}
+    void prangeAdd(int l,int r, int value) {for (l += n, r += n; l < r; l >>= 1, r >>= 1) {if (l&1) tree[l++] += value;if (r&1) tree[--r] += value;}}       //Use to see the increase for a particulare element
+    int pQuery(int l){int res = 0;for (l += n;l > 0; l >>= 1) res += tree[l];return res;}
+
+};
 
 signed main()
 {   
     fast_io();
-    int ans=0;
-    
-    
-    
-      
+    int t=1;
+    // cin>>t;
+    while(t--){
+        int n,q;
+        cin>>n>>q;
+        vi arr(n,0);
+        SegmentTree tree(arr);
+        cin>>arr;
+        while(q--){
+            int type;
+            cin>>type;
+
+            if(type==1){
+                int a, b,u;
+                cin>>a>>b>>u;
+                tree.prangeAdd(a-1,b,u);
+            }
+            else{
+                int k;
+                cin>>k;
+                cout<<arr[k-1]+tree.pQuery(k-1)<<endl;
+            }
+        }   
+
+    }   
 }

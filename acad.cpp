@@ -1,113 +1,160 @@
 #include <bits/stdc++.h>
 using namespace std;
-typedef long long ll;
-typedef long double ld;
-const ld pi = acos(-1);
-#define int ll
-#define vi vector<ll>
-#define vvi vector<vi>
-#define pii pair<ll, ll>
-#define vii vector<pll>
-#define vs vector<string>
-#define fill(a, val) memset(a, val, sizeof(a))
+class SegmentTree{
+    public:
+    int n;
+    vector<long long int> tree;
+    SegmentTree(int n){
+        this->n = n;
+        tree.resize(2*n,0);
+    }
+    SegmentTree(vector<long long int> &x){
+        this->n=x.size();
+        tree.resize(2*n,0);
+        for(int i=n;i<2*n;i++)tree[i] = x[i-n];
+        for (int i = n - 1; i > 0; --i) tree[i] = max(tree[i<<1] , tree[i<<1|1]);
+    }
+    void build(vector<long long int> &x){
+        for(int i=n;i<2*n;i++)tree[i] = x[i-n];
+        for (int i = n - 1; i > 0; --i) tree[i] = max(tree[i<<1] , tree[i<<1|1]);
+    }
+    void set(int p, int value) {for (tree[p += n] = value; p > 1; p >>= 1) tree[p>>1] = max(tree[p] , tree[p^1]);}
+    void add(int p, int value){for (tree[p += n] += value; p > 1; p >>= 1) tree[p>>1] = max(tree[p] , tree[p^1]);}
+    // all on interval [l, r)
+    int query(int l, int r) {long long int res = 0;for (l += n, r += n; l < r; l >>= 1, r >>= 1) {if (l&1) res = max(res,tree[l++]);if (r&1) res = max(res,tree[--r]);}return res;}
+    void prangeAdd(int l,int r, int value) {for (l += n, r += n; l < r; l >>= 1, r >>= 1) {if (l&1) tree[l++] += value;if (r&1) tree[--r] += value;}}       //Use to see the increase for a particulare element
+    int pQuery(int l){long long int res = 0;for (l += n;l > 0; l >>= 1) res += tree[l];return res;}
 
-#define ff first
-#define ss second
-#define forn(i, n) for (ll i = 0; i < (ll)(n); ++i)
-#define FOR(i,a,b) for (ll i = a; i < b; i++) 
-#define rforn(i, n) for (ll i = n - 1; i >= 0; i--)
-#define all(v) v.begin(), v.end()
-#define srt(v) sort(all(v));
-#define rall(v) v.rbegin(), v.rend()
-#define revsort(v) sort(rall(v))
-#define rev(v) reverse(all(v));
-#define PQ(type) priority_queue<type> 
-#define PQD(type) priority_queue<type,vector<type>,greater<type> >  
-#define FLSH fflush(stdout) 
-#define space    " "            
-#define fast_io()  ios::sync_with_stdio(false); cin.tie(0); cout.tie(0);
-#define YES cout<<"YES\n"
-#define NO cout<<"NO\n"
-#define in2(a,b) int a,b;cin >> a>>b;
-#define pairin(v) cin>>v.first>>v.second;
-#define in3(a,b,c) int a,b,c;cin>>a>>b>>c;
-#define in4(a,b,c,d) int a,b,c,d;cin>>a>>b>>c>>d;
-const int mod = 1e9 +7;
-ll gcd(ll a,ll b){return(b?__gcd(a,b):a);} 
-ll gcd(vi &arr){
-  ll ans=arr[0];forn(i,arr.size())ans=gcd(arr[i],ans);  return ans;
+};
+class HLD{
+    using graph = std::vector<std::vector<int>>;
+    static constexpr bool vals_in_edges = false;
+    private:
+
+    int N;
+    graph g;
+    std::vector<int> par, start, depth, sz, in_time;
+    SegmentTree tree;
+    int timer;
+    long long int id_node;
+    long long int combine(long long int x, long long int y){
+        return max(x,y);
+    }
+    public:
+        HLD(const graph &G,int root,vector<long long int> vertex_vals,long long int _id_node):N(G.size()),tree(N){
+            id_node = _id_node;
+            g=G;
+            par.assign(N,-1);
+            start.resize(N);
+            timer = 0;
+            depth.resize(N);
+            sz.resize(N);
+            in_time.resize(N);
+            dfs_sz(root);
+            start[root] =root;
+            dfs_hld(root);
+            vector<long long int> perm(N);
+            for (int i = 0; i < N; ++i) perm[in_time[i]] = vertex_vals[i];
+            tree.build(perm);
+        }
+        bool is_anc(int u, int v) {
+        return in_time[u] <= in_time[v] && in_time[u] + sz[u] >= in_time[v];
+        }
+    
+        // void update_path(int u, int v, long long int val) {
+        //     for (; start[u] != start[v]; v = par[start[v]]) {
+        //         if (depth[start[u]] > depth[start[v]]) swap(u, v);
+        //         tree.update(in_time[start[v]]+1, in_time[v] + 1, val);
+        //     }
+        //     if (depth[u] > depth[v]) swap(u, v);
+        //     tree.update(in_time[u]+1 + vals_in_edges, in_time[v] + 1, val);
+        // }
+        long long int query_path(int u, int v) {
+            long long int ans = id_node;
+            for (; start[u] != start[v]; v = par[start[v]]) {
+                if (depth[start[u]] > depth[start[v]]) swap(u, v);
+                ans = combine(ans, tree.query(in_time[start[v]], in_time[v]+1));
+            }
+            if (depth[u] > depth[v]) swap(u, v);
+            return combine(ans,tree.query(in_time[u] + vals_in_edges, in_time[v]+1));
+        }
+        //long long int query_vertex(int u) { retusrn tree.query(in_time[u]+1,in_time[u] + 1); }
+        void update_vertex(int u, long long int val) { tree.set(in_time[u], val); }
+        // void update_subtree(int u, long long int val) {
+        //     int l = in_time[u] + vals_in_edges+1;
+        //     int r = in_time[u] + sz[u];
+        //     tree.update(l, r, val);
+        // }
+        // long long int query_subtree(int u) {
+        //     return tree.query(in_time[u] + vals_in_edges+1, in_time[u] + sz[u]);
+        // }
+        void dfs_sz(int u) {
+            sz[u] = 1;
+            for (auto& v : g[u]) {
+                
+                par[v] = u;
+                depth[v] = depth[u] + 1;
+                g[v].erase(find(begin(g[v]), end(g[v]), u));
+                dfs_sz(v);
+                sz[u] += sz[v];
+                if (sz[v] > sz[g[u][0]]) swap(v, g[u][0]);
+            }
+        }
+        void dfs_hld(int u) {
+            in_time[u] = timer++;
+            for (auto& v : g[u]) {
+                start[v] = (v == g[u][0] ? start[u] : v);
+                dfs_hld(v);
+            }
+        }
+        int lca(int u, int v) {
+            for (; start[u] != start[v]; v = par[start[v]])
+                if (depth[start[u]] > depth[start[v]]) swap(u, v);
+            return depth[u] < depth[v] ? u : v;
+        }
+        int dist(int u, int v) {
+            return depth[u] + depth[v] - 2 * depth[lca(u, v)];
+        }
+};
+int main(){
+    
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+    int n;
+    cin>>n;
+    int q;
+    cin>>q;
+ 
+    vector<long long int> vals(n);
+    for(int i=0;i<n;i++){
+        cin>>vals[i];
+    }
+ 
+    vector<vector<int>> graph(n);
+    for(int i=0;i<n-1;i++){
+        int u,v;
+        cin>>u>>v;
+        u--;
+        v--;
+        graph[u].push_back(v);
+        graph[v].push_back(u);
+    }
+    
+    HLD hld(graph,0,vals,0);
+    //cin>>q;
+    while(q--){
+        int type;
+        cin>>type;
+        if(type==1){
+            int s,x;
+            cin>>s>>x;
+            hld.update_vertex(s-1,x);
+        }
+        else{
+            int u,v;
+            cin>>u>>v;
+            cout<<hld.query_path(u-1,v-1)<<endl;
+        }
+    }
+
 }
-ll sum(vector<ll> &arr){
-	int ret=0;
-	forn(i,arr.size()){
-		cin>>arr[i];
-		ret+=arr[i];
-	}
-	return ret;
-}
-map<int ,int> frequency(int n){
-	map<int ,int> ret;
-	forn(i,n){
-		int x;
-		cin>>x;
-		ret[x]++;
-	}
-	return ret;
-}
-ll lcm(ll a, ll b){return(a*(b/gcd(a,b)));} 
-ll muln(int a, int b, int c){ll res=(ll)a*b;return ((res%c)+c)%c;} 
-template<typename T>T power(T e, T n, T m){T x=1,p=e;while(n){if(n&1)x=muln(x,p,m);p=muln(p,p,m);n>>=1;}return x;} 
-template<typename T>T extended_euclid(T a, T b, T &x, T &y){T xx=0,yy=1;y=0;x=1;while(b){T q=a/b,t=b;b=a%b;a=t;
-t=xx;xx=x-q*xx;x=t;t=yy;yy=y-q*yy;y=t;}return a;}
-template<typename T> T add(T a, T b){return ((ll)(a+b))%mod; } 
-template<typename T>T mod_inverse(T a, T n){T x,y,z=0;T d=extended_euclid(a,n,x,y);return(d>1?-1:mod_neg(x,z,n));} 
-template<class T1> void deb(T1 e1) {cout << e1 << endl; } 
-template<class T1,class T2> void deb(T1 e1, T2 e2){cout << e1 << space << e2 << endl;} 
-template<class T1,class T2,class T3> void deb(T1 e1, T2 e2, T3 e3) {cout << e1 << space << e2 << space << e3 << endl;} 
-template<class T1,class T2,class T3,class T4> void deb(T1 e1, T2 e2, T3 e3, T4 e4){cout << e1 << space << e2 << space << e3 << space << e4 << endl;} 
-template<class T1,class T2,class T3,class T4,class T5> void deb(T1 e1, T2 e2, T3 e3, T4 e4, T5 e5){cout << e1 << space << e2 << space << e3 << space << e4 << space << e5 << endl;} 
-template<class T1,class T2,class T3,class T4,class T5,class T6> void deb(T1 e1, T2 e2, T3 e3, T4 e4 ,T5 e5, T6 e6){cout << e1 << space << e2 << space << e3 << space << e4 << space << e5 << space << e6 << endl;} 
-template <typename T> inline T PointDistanceHorVer(T x1,T y1,T x2, T y2) {return abs(x1-x2)+abs(y1-y2);} 
-template <typename T> inline T PointDistanceDiagonally(T x1,T y1,T x2, T y2) {return sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));} 
-template <typename T> inline T PointDistanceMinimum(T x1,T y1,T x2, T y2) { T tmp1=abs(x1-x2); T tmp2=abs(y1-y2); T tmp3=abs(tmp1-tmp2); T tmp4=min(tmp1, tmp2); return tmp3+tmp4; } 
-template <typename T> inline T PointDistance3D(T x1,T y1,T z1,T x2,T y2,T z2) {return sqrt(square(x2-x1)+square(y2-y1)+square(z2-z1));} 
-  template <typename T> istream & operator>>(istream &in, vector<T> & v){for(auto &x: v){in>>x;} return in;}
-  template <typename T> ostream& operator<<(ostream& os, const vector<T>& v) {for (int i = 0; i < v.size(); ++i) { os << v[i]; if (i != v.size() - 1) os << " "; } os << "\n"; return os; }
-ll powersimp(ll x, ll n){ll ans = 1;while (n){if (n % 2 == 1)ans = ans * x;n = n / 2; x = x * x;} return ans;}
-// class Timer { private: chrono::time_point <chrono::steady_clock> Begin, End; public: Timer () : Begin(), End ()
-// { Begin = chrono::steady_clock::now(); } ~Timer () { End = chrono::steady_clock::now();
-// cerr << "\nDuration: " << ((chrono::duration <double>)(End - Begin)).count() << "s\n"; } } T;
-// const int FACSZ = 1001; // Make sure to change this 
-// ll ceil_div(ll a, ll b){return (a+b-1)/b;}
-// int fact[FACSZ],ifact[FACSZ]; 
-// void precom(int c){ 
-//     fact[0] = 1; 
-//     FOR(i,1,FACSZ) fact[i] = muln(fact[i-1],i,c); 
-//     ifact[FACSZ-1] = mod_inverse(fact[FACSZ-1],c); 
-//     REPD(i,FACSZ-1){ 
-//         ifact[i] = muln(i+1,ifact[i+1],c); 
-//     } 
-// } 
-// int ncr(int n,int r,int c){ 
-//     return muln(muln(ifact[r],ifact[n-r],c),fact[n],c); 
-// }
-
-// void add(int &a, int b)
-// {
-//     a += b;
-//     if(a >= mod)
-//         a -= mod;
-// }
-// const int dx[] = {0, 1, 0, -};
-// const int dy[] = {1, 0, -1, 0};
-
-
-signed main()
-{
-	
-
-	
-	
-	return 0;
-}
-

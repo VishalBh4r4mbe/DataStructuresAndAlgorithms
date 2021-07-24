@@ -1,2 +1,6 @@
-
+*.in
+*.out
 *.exe
+*.catalyst
+*.bin
+*.prob
