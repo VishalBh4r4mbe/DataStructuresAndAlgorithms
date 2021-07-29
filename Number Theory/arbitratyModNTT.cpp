@@ -1,13 +1,5 @@
-#include <algorithm>
-#include <cassert>
-#include <cstring>
-#include <functional>
-#include <initializer_list>
-#include <iostream>
-#include <memory>
-#include <queue>
-#include <random>
-#include <vector>
+#include "bits/stdc++.h"
+using namespace std;
 
 template <std::uint32_t P> struct ModInt32 {
 public:

@@ -279,6 +279,15 @@ namespace Strings{
             hash= NT::modMul(hash,p_inv_pow[l-1],m);
             return hash;
         }
+        static long long int getHash(string& s){
+            long long hash_value = 0;
+            long long p_pow = 1;
+            for (char c : s) {
+                hash_value = (hash_value + (c - 'a' + 1) * p_pow) % m;
+                p_pow = (p_pow * p) % m;
+            }
+            return hash_value;
+        }
     };
     struct SuffixArray{
     //https://github.com/kth-competitive-programming/kactl/blob/main/content/strings/SuffixArray.h
@@ -382,7 +391,7 @@ void logger(string vars, Args&&... values) {
     // (..., (cout << delim << values, delim = ", "));
     // cout<<WHITE<<endl;
 }
-std::ostream& operator << (std::ostream& dest, __int128_t value) {
+std::ostream& operator << (std::ostream& dest, __int128_t& value) {
     std::ostream::sentry s(dest);
     if (s) {__uint128_t tmp = value<0?-value:value;char buffer[128];char* d = std::end(buffer);
         do {-- d;*d = "0123456789"[tmp%10];tmp/=10;}while(tmp!=0);
@@ -429,6 +438,6 @@ signed main(){
     int t=1;
     cin>>t;
     while(t--){
-
+        
     }
 }

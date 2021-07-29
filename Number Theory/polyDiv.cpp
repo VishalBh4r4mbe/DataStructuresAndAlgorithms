@@ -132,6 +132,9 @@ int main(){
 	for(int& gi : G){
 		cin >> gi;
 	}
+	for(auto x:inversePolynomial(G)){
+		cout<<x<<" ";
+	}
 	auto[Q, R] = q_and_r(F, G);
 	clean(Q), clean(R);
 	cout << Q.size() << " " << R.size() << "\n";
